@@ -1,6 +1,6 @@
 ---
 layout: post
-title: BOLT原理 
+title: Understand BOLT
 tags: ["BOLT","Linker","ELF","lld", "mold", "ld", "ld.bfd", "gold"]
 mathjax: true
 ---
