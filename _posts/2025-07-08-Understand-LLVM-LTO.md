@@ -123,6 +123,7 @@ clang -O2 -flto=thin  main.c sub.c  -fuse-ld=lld -###
 ## POI
 在调试LTO中发现了一些有趣的事情，
 1. 发现LTO有几种modes，不过通过-flto起的为LTOK_Default。
+
 ```
   /// Unified LTO modes
   enum LTOKind {
@@ -135,9 +136,11 @@ clang -O2 -flto=thin  main.c sub.c  -fuse-ld=lld -###
     /// ThinLTO, with Unified LTO enabled.
     LTOK_UnifiedThin,
   };
+
 ```
 
 2. 在BitcodeCompiler::BitcodeCompiler() 中，发现似乎有分布式编译的功能对于ThinLTO。
+
 ```
 BitcodeCompiler::BitcodeCompiler() {
   // Initialize indexFile.
@@ -178,7 +181,9 @@ ThinLTO与FullLTO都是中端优化都是走的这里。
   } else {
     MPM.addPass(PB.buildLTODefaultPipeline(OL, ExportSummary));
   }
+
 ```
+
 
 而codegen走的llvm/lib/LTO/LTOBackend.cpp:codegen函数。
 
