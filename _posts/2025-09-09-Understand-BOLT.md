@@ -39,3 +39,6 @@ mathjax: true
 +	数据中心大规模二进制
 +	前端受限严重的程序
 +	需要结合静态编译优化和运行时 Profile 的场景
+
+# 相关链接
+https://llvm.org/devmtg/2024-03/slides/practical-use-of-bolt.pdf
