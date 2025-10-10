@@ -5,7 +5,7 @@ tags: ["Clang", "CUDA"]
 mathjax: true
 ---
 
-- [Clang \& NVCC](#clang--nvcc)
+- [Clang & NVCC](#clang--nvcc)
   - [背景](#背景)
   - [Clang如何编译cuda程序](#clang如何编译cuda程序)
   - [NVCC如何编译cuda程序](#nvcc如何编译cuda程序)
@@ -25,29 +25,34 @@ mathjax: true
 
 
 # Clang & NVCC
-本文档探索以下：
-1.	探索clang & nvcc编译cuda程序的流程以及区别
-2.	cuda程序执行流程
-3.	CUDA toolkit分析
-4.	LLVM PTX backend
-5.  PTX分析
+站在编译器开发者的角度看待，
+1. 需要知道怎么编译链接？
+2. 需要知道怎么执行起来的？
+3. 需要知道cuda开发包里面有什么？
+4. 需要知道编译器后端主要做了什么？
+5. 需要知道PTX是怎么回事？
+   
+
+
 
 ## 背景
-1.	Cuda 版本
-    +	CUDA Tookit工具链版本，可以用gcc 11/12这种版本理解，决定API/库版本，以及支持的compute capability。
-2.	Ptx版本
-    +	对应CUDA Toolkit支持的指令集，前向兼容
-    +	可以理解为LLVM IR/Java Bitcode version
-3.	SASS版本
-    +	GPU硬件的二进制指令，绑定到SM 架构号(sm_70)
-4.	Compute capability（SM version）
+1.	Compute capability（SM version）
     + 每代GPU架构定义的版本号，类似Neoverse-N1,N2这种
     + 硬件指令(SAAS)Nvidia不开源，所以是直接绑定到了SM version上，可以理解为-march=，指明了GPU的硬件架构以及可用的指令集。
-    + --cuda-gpu-arch=sm_80
+    + --cuda-gpu-arch=sm_80, clang编译时指定SM version
+2.	Cuda 版本
+    +	CUDA Tookit工具链版本，可以用gcc 11/12这种版本理解，决定API/库版本，以及支持的compute capability。
+3.	PTX版本
+    +	对应CUDA Toolkit支持的指令集，前向兼容
+    +	可以理解为LLVM IR/Java Bitcode version
+    + 和SM Version以及CUDA Version没有关系。
+4.	SASS版本
+    +	GPU硬件的二进制指令，绑定到SM 架构号(sm_70)
+    + 闭源
 
 5.	Driver Version
-> https://developer.nvidia.com/cuda-gpus
- ToolKit对其做强制要求。
+    > https://developer.nvidia.com/cuda-gpus
+    + ToolKit对其做强制要求。
 
 
 ## Clang如何编译cuda程序
@@ -205,14 +210,12 @@ JIT,请看附录例子。
  The toolkit includes GPU-accelerated libraries, debugging and optimization tools, a C/C++ compiler, and a runtime library.
 
 ```
-| 目录/文件                                       | 说明                                                             |
-| ------------------------------------------- | -------------------------------------------------------------- |
-| `bin/`                                      | CUDA 命令行工具，比如 `nvcc`、`cuda-gdb`、`fatbinary`、`ptxas` 等          |
-| `lib64/`                                    | 64-bit 静态库和动态库（如 `libcudart.so` stubs）            |
-| `include/`                                  | CUDA headers（比如 `cuda_runtime.h`、`device_launch_parameters.h`） |
-| `nvvm/`                                     | NVVM IR 和编译器库，支持 PTX 生成和 JIT                                   |
-                                                          
-
+/usr/local/cuda/
+├── bin   // 工具，编译器，调试器等
+├── include -> targets/x86_64-linux/include
+├── lib64 -> targets/x86_64-linux/lib // driver，其他计算库
+├── nvvm // NVVM IR
+...
 ```
 
 
@@ -220,7 +223,7 @@ JIT,请看附录例子。
 > https://llvm.org/docs/NVPTXUsage.html
 
 + LLVM IR子集(NVVM)
-调试clang编译cuda，
++ 通过调试看clang如何编译cuda，
 
 ```
 #0  addPassesToGenerateCode (TM=..., PM=..., DisableVerify=false, MMIWP=...) at /home/kindles/llvm/llvm/lib/CodeGen/CodeGenTargetMachineImpl.cpp:119
@@ -487,8 +490,16 @@ void TargetPassConfig::addMachinePasses() {
 
 PTX, a low-level parallel thread execution virtual machine and instruction set architecture (ISA). 
 
+PTX是虚拟机以及运行在虚拟机上ISA, 由于SASS闭源，虚拟机以下对外界是透明的，所以基本可以认为PTX就是物理机以及真实ISA。
 
-
+从官方文档可以看到PTX主要包含了这几个方面，
++ 软件编程模型 // 抽象出 线程、线程块、网格 (thread/block/grid) 的层级
++ PTX机器模型 // 定义了虚拟硬件资源模型
++ PTX汇编语法 // 汇编与C的综合体
++ 内存空间 // PTX可以操控的内存空间以及操控方式
++ PTX指令集 // 虚拟指令集
++ 内存一致性 // GPU 层级内存的可见性和一致性
++ ABI // 虚拟层级的函数调用与数据布局规范
 
 
 ## 参考
