@@ -248,15 +248,6 @@ load_elf_binary()       # 内核加载 ELF
 
 ---
 
-如果你愿意，我可以帮你画一张 **完整流程图**，把：
-
-* 内核阶段
-* linux_binprm
-* loader
-* relocate / lazy bind
-* `_start` → `main`
-
-
 # Segments
 
 ```
@@ -364,6 +355,7 @@ C 运行时库主要分两部分
 
 
 ## crt*.o
+
 | 文件         | 主要作用                             | 典型位置                        |
 | ---------- | -------------------------------- | --------------------------- |
 | **crt0.o** | 最早版本启动文件，提供 `_start`             | 古老 UNIX / 教学示例              |
@@ -376,3 +368,4 @@ C 运行时库主要分两部分
 # 参考
 1. Linux内核源码
 2. ChatGPT
+3. https://maskray.me/blog/2021-11-07-init-ctors-init-array
