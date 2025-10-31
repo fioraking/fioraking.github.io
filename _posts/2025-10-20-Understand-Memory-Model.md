@@ -1,3 +1,9 @@
+---
+layout: post
+title: Understand Memory Model
+tags: ["内存模型"]
+mathjax: true
+---
 # Memory Model
 
 从多线程的角度出发，A线程中对共享变量的访问和修改，对其他线程来说是怎么样的，我们需要定义一种模型来描述这种“怎么样”，这个模型就是Memory Model，它是硬件提供给软件的模型，应用开发人员仅需要了解内存模型就可以对在多线程中解决共享变量的问题。
