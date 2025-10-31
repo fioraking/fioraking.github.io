@@ -1,3 +1,10 @@
+---
+layout: post
+title: Understand ByteOrder
+tags: ["字节序与大小端"]
+mathjax: true
+---
+
 字节序与大小端
 # 1.	字节序（endianness）
 对于0x12345678这个十六进制数据
